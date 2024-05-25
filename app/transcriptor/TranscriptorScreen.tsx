@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, PermissionsAndroid, Platform, StyleSheet, Text, View } from "react-native";
-import AudioRecorderPlayer, { AudioEncoderAndroidType, AudioSourceAndroidType } from "react-native-audio-recorder-player";
+import AudioRecorderPlayer from "react-native-audio-recorder-player";
 import RNFetchBlob from "rn-fetch-blob";
 
 const audioRecordPlayer = new AudioRecorderPlayer();

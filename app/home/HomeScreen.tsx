@@ -1,9 +1,13 @@
 import { Button, StyleSheet, Text, View } from "react-native";
 
-function HomeScreen({ navigation }) {
+function HomeScreen({ navigation }): React.JSX.Element {
   return (
     <View style={styles.view}>
       <Text>Home Screen</Text>
+      <Button
+        title="Avatar Scene"
+        onPress={() => navigation.navigate("AvatarScene")}
+      />
       <Button
         title="Go to transcriptor" 
         onPress={() => navigation.navigate("Transcriptor")}
