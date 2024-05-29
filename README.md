@@ -1,7 +1,7 @@
 # Para empezar 
 
 - Crear archivo `.env` en la raiz del proyecto y siguiendo el ejemplo de `.env.example` apuntar al [backend](https://github.com/tomasdivito/heartogether-backend)
-- Descargar de [Drive](https://drive.google.com/drive/folders/1to1eyCKjT_xRpPeOY_vMEDaicx_rY6OR?usp=sharing) todos los contenidos de la carpeta y colocarlos en la carpeta `/models`
+- Descargar de [Drive](https://drive.google.com/drive/folders/1to1eyCKjT_xRpPeOY_vMEDaicx_rY6OR?usp=sharing) todos los contenidos de la carpeta y colocarlos en la carpeta `app/models/`
 
 # General para React Native
 
