@@ -2,18 +2,47 @@ import { useState } from "react";
 import { Button, PermissionsAndroid, Platform, StyleSheet, Text, View } from "react-native";
 import AudioRecorderPlayer from "react-native-audio-recorder-player";
 import RNFetchBlob from "rn-fetch-blob";
+import Config from "react-native-config";
 
 const audioRecordPlayer = new AudioRecorderPlayer();
 
 function TranscriptorScreen({ navigation }) {
   const [recording, setRecording] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [text, setText] = useState('');
+  const [buttonText, setButtonText] = useState('TRANSCRIBIR');
 
   const dirs = RNFetchBlob.fs.dirs;
   const uri = Platform.select({
     ios: 'hello.mp4',
     android: `${dirs.CacheDir}/hello.mp3`,
   });
+
+  const sendAudio = async (uri) => {
+    const form = new FormData();
+    form.append('audio', {
+      //uri: RNFetchBlob.wrap(uri),
+      uri: 'file://'+uri,
+      type: 'audio/mpeg',
+      name: 'audio.mp3',
+    });
+    try {
+      const response = await fetch(`${Config.API_URL}/transcribe`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        body: form
+      });
+      const json = await response.text();
+      console.log('response:', json);
+      setText(json);
+
+    } catch(err) {
+      console.log('got error:',err);
+    }
+  }
+
   const startRecording = async () => {
     // handle permissions
     // TODO: move this to work only when need it
@@ -59,9 +88,12 @@ function TranscriptorScreen({ navigation }) {
   } 
 
   const stopRecording = async () => {
+    setText('');
+    setButtonText('GRABANDO');
     try {
       const result = await audioRecordPlayer.stopRecorder();
       console.log('result from stopping recorder:', result);
+      startPlaying();
     } catch (error) {
       console.log('error stopping recording:', error);
     }
@@ -71,10 +103,18 @@ function TranscriptorScreen({ navigation }) {
   };
 
   const startPlaying = async () => {
+    console.log('trying to play uri:', uri);
+
     try {
       const result = await audioRecordPlayer.startPlayer(uri);
       console.log('result from playing:', result);
+      sendAudio(uri);
       setPlaying(true);
+      setButtonText('DETENER')
+      setTimeout(() => {
+        //this is a hack, we should check the time and stop correctly.
+        stopPlaying();
+      }, 30_000);
     } catch (error) {
       console.log('error playing audio:', error);
     }
@@ -82,6 +122,7 @@ function TranscriptorScreen({ navigation }) {
 
   const stopPlaying = async () => {
     try {
+      setButtonText('TRANSCRIBIR')
       const result = await audioRecordPlayer.stopPlayer();
       console.log('result from stoping playing:', result); 
       setPlaying(false);
@@ -92,19 +133,13 @@ function TranscriptorScreen({ navigation }) {
 
   return (
     <View style={styles.view}>
-      <Text>Transcriptor screen</Text>
       <Button
-        title={recording ? 'Parar grabacion' : 'Iniciar grabacion'}
+        title={recording ? 'Detener' : 'Iniciar grabacion'}
         onPress={recording ? stopRecording : startRecording}
       />
-      <Button
-        title={playing ? 'Detener reproduccion' : 'Reproducir'}
-        onPress={playing ? stopPlaying : startPlaying}
-      />
-      <Button
-        title="Back home"
-        onPress={() => navigation.navigate("Home")}
-      />
+      <Text style={{ color: 'black', fontWeight: 500 }}>
+        {text}
+      </Text>
     </View>
   )
 }
